@@ -25,7 +25,7 @@ function App() {
       
       // Validation: Finnhub returns 0 for invalid tickers
       if (!result || result.price === 0) {
-        setError(`Ticker "${ticker}" not found. Please enter a valid symbol.`);
+        setError(`Ticker "${ticker}" not found. Please enter a valid symbol or click the button below to reset.`);
         setData(null);
         return;
       }
@@ -85,7 +85,7 @@ function App() {
           <AlertTriangle color="#f87171" size={32} />
           <p>{error}</p>
           <button className="reset-btn" onClick={() => {setTicker('DIS'); setError(null);}}>
-            Return to Disney
+            Return to Default
           </button>
         </div>
       )}
