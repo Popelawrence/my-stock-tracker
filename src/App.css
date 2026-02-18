@@ -170,3 +170,46 @@ header {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* New Ticker Label Styling */
+.ticker-label {
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+/* Error Container Styling */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(248, 113, 113, 0.05);
+  border: 1px dashed var(--down-color);
+  border-radius: 20px;
+  padding: 3rem 1.5rem;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+
+.error-container p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.reset-btn {
+  background: var(--accent);
+  color: var(--bg-dark);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.reset-btn:hover {
+  transform: scale(1.05);
+}

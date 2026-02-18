@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchStockPrice } from './api';
 import './App.css';
 import { LineChart, Line, ResponsiveContainer, YAxis, Tooltip } from 'recharts';
-import { TrendingUp, TrendingDown, RefreshCw, Bell } from 'lucide-react';
+import { TrendingUp, TrendingDown, RefreshCw, Bell, AlertTriangle } from 'lucide-react';
 
 function App() {
   const [ticker, setTicker] = useState('DIS'); 
@@ -10,8 +10,8 @@ function App() {
   const [history, setHistory] = useState([]); 
   const [loading, setLoading] = useState(false);
   const [targetPrice, setTargetPrice] = useState('');
+  const [error, setError] = useState(null); // New state for error handling
 
-  // 1. Request Browser Notification Permission
   useEffect(() => {
     if (Notification.permission === 'default') {
       Notification.requestPermission();
@@ -22,30 +22,46 @@ function App() {
     setLoading(true);
     try {
       const result = await fetchStockPrice(ticker);
-      setData(result);
       
-      // Data Engineering: Maintain a sliding window of the last 10 entries
+      // Validation: Finnhub returns 0 for invalid tickers
+      if (!result || result.price === 0) {
+        setError(`Ticker "${ticker}" not found. Please enter a valid symbol.`);
+        setData(null);
+        return;
+      }
+
+      setError(null);
+      setData(result);
+
+      // Update history with new entry. We keep only the last 10 entries for performance. 
       setHistory(prev => {
-        const newHistory = [...prev, { time: result.lastUpdated, price: result.price }];
+        const newHistory = [
+          ...prev, 
+          { 
+            time: result.lastUpdated, 
+            price: result.price, 
+            symbol: ticker.toUpperCase() // Added symbol to distinguish entries
+          }
+        ];
         return newHistory.slice(-10); 
       });
 
-      // 2. Alert Logic
       if (targetPrice && result.price >= parseFloat(targetPrice)) {
         new Notification("Target Reached! 🚀", {
           body: `${ticker} has hit your target of $${targetPrice}. Current: $${result.price}`,
         });
-        setTargetPrice(''); // Clear alert after firing
+        setTargetPrice('');   // Clear alert after firing
       }
 
     } catch (err) {
+      setError("Network error. Please try again later.");
       console.error("Fetch failed", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. The "Pulse" - Auto-refresh every 30 seconds
+  // Fetch latest price on component mount and whenever ticker changes. Auto-refresh every 30 seconds
   useEffect(() => {
     getLatestPrice();
     const pulse = setInterval(getLatestPrice, 30000);
@@ -63,7 +79,18 @@ function App() {
         </div>
       </header>
 
-      {data && (
+      {/* Error Message Display */}
+      {error && (
+        <div className="error-container fade-in">
+          <AlertTriangle color="#f87171" size={32} />
+          <p>{error}</p>
+          <button className="reset-btn" onClick={() => {setTicker('DIS'); setError(null);}}>
+            Return to Disney
+          </button>
+        </div>
+      )}
+
+      {data && !error && (
         <main className="dashboard">
           <section className="price-card">
             <div className="ticker-info">
@@ -107,7 +134,6 @@ function App() {
                 onChange={(e) => setTargetPrice(e.target.value)}
               />
             </div>
-            {targetPrice && <p className="alert-msg">Alerting at ${targetPrice}</p>}
           </section>
 
           <section className="history-table-container">
@@ -116,6 +142,7 @@ function App() {
               <table className="history-table">
                 <thead>
                   <tr>
+                    <th>Ticker</th> {/* New Column */}
                     <th>Time</th>
                     <th>Price</th>
                     <th>Status</th>
@@ -124,6 +151,7 @@ function App() {
                 <tbody>
                   {history.slice().reverse().map((entry, index) => (
                     <tr key={index} className="fade-in">
+                      <td className="ticker-label">{entry.symbol}</td>
                       <td>{entry.time}</td>
                       <td>${entry.price.toFixed(2)}</td>
                       <td>
