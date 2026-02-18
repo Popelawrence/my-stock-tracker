@@ -64,6 +64,8 @@ function App() {
   // Fetch latest price on component mount and whenever ticker changes. Auto-refresh every 30 seconds
   useEffect(() => {
     getLatestPrice();
+    setHistory([]); // Wipes the old stock data
+    setError(null); // Clears any previous error messages
     const pulse = setInterval(getLatestPrice, 30000);
     return () => clearInterval(pulse);
   }, [ticker]);
