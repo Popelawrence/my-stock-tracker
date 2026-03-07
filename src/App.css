@@ -213,3 +213,38 @@ header {
 .reset-btn:hover {
   transform: scale(1.05);
 }
+
+.time-range-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.range-btn {
+  padding: 8px 16px;
+  border: 1px solid #475569;
+  background: transparent;
+  color: #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.range-btn:hover {
+  border-color: #94a3b8;
+  color: #e2e8f0;
+}
+
+.range-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.chart-preview {
+  height: 400px;
+  margin-bottom: 20px;
+}
